@@ -35,3 +35,4 @@ const initServer = async () => {
 };
 
 initServer();
+module.exports = app;  // Exporting app for testing

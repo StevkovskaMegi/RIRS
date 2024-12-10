@@ -43,6 +43,7 @@ router.get('/:userId', authenticateToken, async (req, res) => {
 
     res.json(expenses); // Return the found expenses
   } catch (err) {
+    console.error('Error:', err);  // Add this for debugging
     res.status(500).json({ message: err.message });
   }
 });

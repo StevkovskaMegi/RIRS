@@ -67,6 +67,8 @@ router.post("/", authenticateToken, async (req, res) => {
       plainPassword, // This can be removed in production; shared for testing purposes
     });
   } catch (err) {
+    console.error('Error creating user:', err);  // Log the error to see if something fails
+
     res.status(400).json({ message: err.message });
   }
 });
