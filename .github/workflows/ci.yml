@@ -1,0 +1,64 @@
+name: CI Workflow
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  frontend-tests:
+    name: Run Frontend Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 22
+
+      - name: Install Dependencies
+        working-directory: ./front
+        run: npm install
+
+      - name: Run Tests
+        working-directory: ./front
+        run: npm test
+
+      - name: Upload Coverage Report
+        if: success()
+        uses: actions/upload-artifact@v3
+        with:
+          name: frontend-coverage-report
+          path: ./frontend/coverage
+
+  backend-tests:
+    name: Run Backend Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 22
+
+      - name: Install Dependencies
+        working-directory: ./backend
+        run: npm install
+
+      - name: Run Tests
+        working-directory: ./backend
+        run: npm test
+
+      - name: Upload Coverage Report
+        if: success()
+        uses: actions/upload-artifact@v3
+        with:
+          name: backend-coverage-report
+          path: ./backend/coverage
