@@ -23,7 +23,7 @@ jobs:
 
       - name: Install Dependencies
         working-directory: ./front
-        run: npm install
+        run: npm test -- --coverage
 
       - name: Run Tests
         working-directory: ./front
@@ -50,7 +50,7 @@ jobs:
 
       - name: Install Dependencies
         working-directory: ./backend
-        run: npm install
+        run: npm test -- --coverage
 
       - name: Run Tests
         working-directory: ./backend
