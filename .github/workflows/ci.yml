@@ -23,17 +23,15 @@ jobs:
 
       - name: Install Dependencies
         working-directory: ./front
-        run: npm test -- --coverage
+        run: npm install
 
       - name: Run Tests
         working-directory: ./front
-        run: npm test
-
       - name: Upload Coverage Report
         if: success()
         uses: actions/upload-artifact@v3
         with:
-          name: frontcoverage-report
+          name: front-coverage-report
           path: ./front/coverage
 
   backend-tests:
@@ -50,11 +48,11 @@ jobs:
 
       - name: Install Dependencies
         working-directory: ./backend
-        run: npm test -- --coverage
+        run: npm install
 
       - name: Run Tests
         working-directory: ./backend
-        run: npm test
+        run: npm test -- --coverage
 
       - name: Upload Coverage Report
         if: success()
