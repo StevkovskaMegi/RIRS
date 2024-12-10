@@ -71,10 +71,6 @@ describe('Manager Router', () => {
 });
 
   
-  
-  
-  
-  
 
   test('GET /api/manager/requests/users - Should return 401 for missing token', async () => {
     const response = await request(app).get('/api/manager/requests/users');
