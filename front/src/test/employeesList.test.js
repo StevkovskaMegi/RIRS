@@ -2,7 +2,7 @@ import React from 'react';
 import { render, screen, fireEvent, waitFor, within } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import EmployeesList from '../components/EmployeesList';
-import * as api from '../services/api'; // Mocking API calls
+import * as api from '../services/api';
 
 jest.mock('../services/api', () => ({
   fetchEmployees: jest.fn(),
@@ -50,13 +50,10 @@ describe('EmployeesList Component', () => {
     api.updateEmployeeBudget.mockResolvedValueOnce({});
     render(<EmployeesList />);
   
-    // Wait for the employee data to load
     await waitFor(() => expect(screen.getByText(/John Doe/i)).toBeInTheDocument());
   
-    // Open the dialog for John Doe
     fireEvent.click(screen.getByText(/John Doe/i));
   
-    // Scope the search to the dialog
     const dialog = screen.getByRole('dialog');
     const budgetInput = within(dialog).getByLabelText(/Budget/i);
     
@@ -67,7 +64,6 @@ describe('EmployeesList Component', () => {
     // Save the updated budget
     fireEvent.click(within(dialog).getByText(/save/i));
   
-    // Wait for the API call and the dialog to close
     await waitFor(() => {
       expect(api.updateEmployeeBudget).toHaveBeenCalledWith('1', '1500');
       expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
@@ -87,7 +83,6 @@ describe('EmployeesList Component', () => {
     await waitFor(() => expect(screen.getByText(/John Doe/i)).toBeInTheDocument());
     fireEvent.click(screen.getByText(/John Doe/i));
   
-    // Narrow the scope of the search by using a container within the dialog
     const dialog = screen.getByRole('dialog');
     const budgetInput = within(dialog).getByLabelText(/Budget/i);
     fireEvent.change(budgetInput, { target: { value: '1500' } });

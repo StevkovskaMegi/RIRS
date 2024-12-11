@@ -27,12 +27,11 @@ describe('UserList Component', () => {
   test('pagination displays correct number of users per page', () => {
     render(<UserList users={mockUsers} />);
     
-    // Target only user names and exclude the "Recent Added Employees" heading
     const displayedUserNames = screen
       .getAllByRole('heading', { level: 6 })
       .filter((element) => element.textContent !== 'Recent Added Employees');
     
-    expect(displayedUserNames).toHaveLength(6); // Default items per page is 6
+    expect(displayedUserNames).toHaveLength(6); 
   });
   
   
@@ -46,7 +45,7 @@ describe('UserList Component', () => {
     render(<UserList users={mockUsers} />);
     const nextButton = screen.getByText(/Next/i);
 
-    fireEvent.click(nextButton); // Go to the second page
+    fireEvent.click(nextButton);
 
     expect(screen.getByText(/Page 2 of 3/i)).toBeInTheDocument();
 
@@ -73,8 +72,8 @@ describe('UserList Component', () => {
     const nextButton = screen.getByText(/Next/i);
     const prevButton = screen.getByText(/Previous/i);
 
-    fireEvent.click(nextButton); // Go to the second page
-    fireEvent.click(prevButton); // Go back to the first page
+    fireEvent.click(nextButton); 
+    fireEvent.click(prevButton); 
 
     expect(screen.getByText(/Page 1 of 3/i)).toBeInTheDocument();
     const firstUser = mockUsers[0];
@@ -93,8 +92,8 @@ describe('UserList Component', () => {
     const nextButton = screen.getByText(/Next/i);
     const pageInfo = screen.getByText(/Page 1 of 3/i);
 
-    expect(prevButton).toBeDisabled(); // On the first page
-    expect(nextButton).not.toBeDisabled(); // Can navigate to the next page
-    expect(pageInfo).toBeInTheDocument(); // Correct page information
+    expect(prevButton).toBeDisabled(); 
+    expect(nextButton).not.toBeDisabled(); 
+    expect(pageInfo).toBeInTheDocument(); 
   });
 });

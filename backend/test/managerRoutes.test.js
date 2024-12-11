@@ -2,19 +2,17 @@ const request = require('supertest');
 const express = require('express');
 const jwt = require('jsonwebtoken');
 const mongoose = require('mongoose');
-const managerRouter = require('../routes/managerRouter'); // Adjust path as needed
+const managerRouter = require('../routes/managerRouter'); 
 const Expense = require('../schemas/expense');
-const User = require('../schemas/user'); // Assuming you have a User model
+const User = require('../schemas/user'); 
 const ExpensesService = require('../services/ExpensesService');
 
-jest.mock('../schemas/expense'); // Mock the Expense model
-jest.mock('../schemas/user'); // Mock the User model
-// Before each test, mock the ExpenseService methods
+jest.mock('../schemas/expense'); 
+jest.mock('../schemas/user'); 
 beforeEach(() => {
-    jest.spyOn(ExpensesService, 'getExpenses').mockResolvedValue([]); // Mock to return an empty array
+    jest.spyOn(ExpensesService, 'getExpenses').mockResolvedValue([]); 
 });
 
-// After each test, clear mocks to prevent side effects
 afterEach(() => {
     jest.restoreAllMocks();
 });
@@ -31,7 +29,7 @@ const mockExpense = {
     user: '456',
     description: 'Business trip expenses',
     amount: 500,
-    date: new Date().toISOString(),  // Convert date to string (ISO format)
+    date: new Date().toISOString(),  
     status: 'pending',
   };
   
@@ -51,7 +49,6 @@ describe('Manager Router', () => {
     jest.clearAllMocks();
   });
   test('GET /api/manager/requests/users - Should return pending expenses for manager', async () => {
-    // Mock ExpenseService.getExpenses to return the mockExpense (array with one expense object)
     const mockExpense = {
         id: "1",
         description: "Business trip expenses",
@@ -60,7 +57,7 @@ describe('Manager Router', () => {
         date: "2024-12-10T11:06:29.407Z",
         user: "456"
     };
-    ExpensesService.getExpenses.mockResolvedValueOnce([mockExpense]); // Simulate returning pending expense
+    ExpensesService.getExpenses.mockResolvedValueOnce([mockExpense]); 
 
     const response = await request(app)
         .get('/api/manager/requests/users')
@@ -80,7 +77,6 @@ describe('Manager Router', () => {
   });
 
   test('GET /api/manager/requests/users - Should return 404 if no pending expenses exist', async () => {
-    // Mock ExpenseService.getExpenses to return an empty array
     ExpensesService.getExpenses.mockResolvedValueOnce([]); // Simulate no pending expenses
 
     const response = await request(app)
@@ -91,11 +87,8 @@ describe('Manager Router', () => {
     expect(response.body.message).toBe('No pending expenses found');
 });
 
-  
-  
 
 test('GET /api/manager/requests/users - Should handle database errors gracefully', async () => {
-    // Mock ExpenseService.getExpenses to simulate a database error by rejecting with an error
     ExpensesService.getExpenses.mockRejectedValueOnce(new Error('Database error'));
 
     const response = await request(app)
@@ -110,19 +103,16 @@ test('GET /api/manager/requests/users - Should handle database errors gracefully
 });
 
 
-
-
-
 test('GET /api/manager/requests/users - Should return 403 if manager token is invalid', async () => {
-    const invalidToken = 'invalid.token.here';  // Simulating an obviously invalid token
+    const invalidToken = 'invalid.token.here';  
   
     const response = await request(app)
-      .get('/api/manager/requests/users')  // Making the GET request
-      .set('Authorization', `Bearer ${invalidToken}`)  // Set invalid token in Authorization header
-      .send();  // No need to send any body for this test
+      .get('/api/manager/requests/users')  
+      .set('Authorization', `Bearer ${invalidToken}`)  
+      .send(); 
   
-    expect(response.status).toBe(403);  // Invalid token should result in 403 Forbidden
-    expect(response.body.message).toBe('Invalid token');  // Ensure the error message is 'Invalid token'
+    expect(response.status).toBe(403); 
+    expect(response.body.message).toBe('Invalid token');  
   });
   
   
