@@ -54,7 +54,6 @@
     "@testing-library/react": "^16.1.0",
     "babel-jest": "^29.7.0"
   },
-  "type": "module",
   "jest": {
     "transform": {
       "^.+\\.jsx?$": "babel-jest"
