@@ -8,7 +8,7 @@ import {
   Alert,
   Box,
 } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate} from 'react-router-dom';
 
 const LoginForm = ({ loginChange }) => {
   const [email, setEmail] = useState('');
@@ -31,7 +31,7 @@ const LoginForm = ({ loginChange }) => {
         navigate('/');
       }
     }
-  }, []);
+  }, [navigate, user.role]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
