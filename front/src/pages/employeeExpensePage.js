@@ -42,7 +42,6 @@ const EmployeeExpensePage = () => {
   const [isGroupExpense, setIsGroupExpense] = useState(false);
   const [userLogged, setUserLogged] = useState(null);
   const [user, setUser] = useState(null);
-  const [message, setMessage] = useState(null);
   const [expenses, setExpenses] = useState([]);
   const [groups, setGroups] = useState([]); // For storing available groups
   const [selectedGroup, setSelectedGroup] = useState(""); // For selected group ID
@@ -85,7 +84,6 @@ const EmployeeExpensePage = () => {
   const handleExpenseSubmit = async (e) => {
     e.preventDefault();
     if (!user) {
-      setMessage("User not found. Please log in again.");
       navigate("/login");
       return;
     }
@@ -100,14 +98,12 @@ const EmployeeExpensePage = () => {
     };
 
     try {
-      const response = await requestExpense(expenseData);
-      setMessage("Expense request submitted successfully");
+      await requestExpense(expenseData);
       setDescription("");
       setAmount("");
       setDate("");
       setIsGroupExpense(false);
     } catch (err) {
-      setMessage("Failed to submit expense request");
     }
   };
 
