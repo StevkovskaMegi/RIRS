@@ -3,7 +3,7 @@ const router = express.Router();
 const jwt = require("jsonwebtoken");
 
 const JWT_SECRET = "Vkm123vkm$$$";
-const sendNotification = require('../utils/EmailService');
+const sendNotification = require('../utils/MailService');
 
 const UserService = require("../services/UserService");
 const ExpenseService = require("../services/ExpensesService");

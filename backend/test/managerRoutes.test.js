@@ -4,10 +4,10 @@ const jwt = require('jsonwebtoken');
 const nodemailer = require('nodemailer');
 const managerRouter = require('../routes/managerRouter');
 const ExpenseService = require('../services/ExpensesService');
-const sendNotification = require('../utils/EmailService'); // Funkcija za pošiljanje e-pošte
+const sendNotification = require('../utils/MailService');
 
 jest.mock('../services/ExpensesService'); // Mockanje ExpensesService
-jest.mock('../utils/emailService'); // Mockanje sendNotification
+jest.mock('../utils/MailService'); // Mockanje sendNotification
 
 const app = express();
 app.use(express.json());
