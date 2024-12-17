@@ -3,7 +3,7 @@ const router = express.Router();
 const jwt = require("jsonwebtoken");
 
 const JWT_SECRET = "Vkm123vkm$$$";
-const sendNotification = require('../utils/EmailService');  // Uvozimo sendNotification iz emailService
+const sendNotification = require('../utils/EmailService');
 
 const UserService = require("../services/UserService");
 const ExpenseService = require("../services/ExpensesService");

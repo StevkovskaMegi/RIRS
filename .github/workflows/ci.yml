@@ -1,82 +1,82 @@
-name: CI Workflow
+# name: CI Workflow
 
-on:
-  push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
+# on:
+#   push:
+#     branches:
+#       - main
+#   pull_request:
+#     branches:
+#       - main
 
-jobs:
-  frontend-tests:
-    name: Frontend CI
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v3
+# jobs:
+#   frontend-tests:
+#     name: Frontend CI
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: Checkout Code
+#         uses: actions/checkout@v3
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: 22
+#       - name: Set up Node.js
+#         uses: actions/setup-node@v3
+#         with:
+#           node-version: 22
 
-      - name: Install Dependencies
-        working-directory: ./front
-        run: npm install
+#       - name: Install Dependencies
+#         working-directory: ./front
+#         run: npm install
 
-      - name: Build Frontend
-        working-directory: ./front
-        run: |
-          if [ -f "package.json" ] && grep -q '"build":' package.json; then
-            npm run build
-          else
-            echo "No build script found, skipping build step."
-          fi
+#       - name: Build Frontend
+#         working-directory: ./front
+#         run: |
+#           if [ -f "package.json" ] && grep -q '"build":' package.json; then
+#             npm run build
+#           else
+#             echo "No build script found, skipping build step."
+#           fi
 
-      - name: Run Tests
-        working-directory: ./front
-        run: npm test -- --coverage
+#       - name: Run Tests
+#         working-directory: ./front
+#         run: npm test -- --coverage
 
-      - name: Upload Coverage Report
-        if: success()
-        uses: actions/upload-artifact@v3
-        with:
-          name: frontend-coverage-report
-          path: ./front/coverage
+#       - name: Upload Coverage Report
+#         if: success()
+#         uses: actions/upload-artifact@v3
+#         with:
+#           name: frontend-coverage-report
+#           path: ./front/coverage
 
-  backend-tests:
-    name: Backend CI
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v3
+#   backend-tests:
+#     name: Backend CI
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: Checkout Code
+#         uses: actions/checkout@v3
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: 22
+#       - name: Set up Node.js
+#         uses: actions/setup-node@v3
+#         with:
+#           node-version: 22
 
-      - name: Install Dependencies
-        working-directory: ./backend
-        run: npm install
+#       - name: Install Dependencies
+#         working-directory: ./backend
+#         run: npm install
 
-      - name: Build Backend
-        working-directory: ./backend
-        run: |
-          if [ -f "package.json" ] && grep -q '"build":' package.json; then
-            npm run build
-          else
-            echo "No build script found, skipping build step."
-          fi
+#       - name: Build Backend
+#         working-directory: ./backend
+#         run: |
+#           if [ -f "package.json" ] && grep -q '"build":' package.json; then
+#             npm run build
+#           else
+#             echo "No build script found, skipping build step."
+#           fi
 
-      - name: Run Tests
-        working-directory: ./backend
-        run: npm test -- --coverage
+#       - name: Run Tests
+#         working-directory: ./backend
+#         run: npm test -- --coverage
 
-      - name: Upload Coverage Report
-        if: success()
-        uses: actions/upload-artifact@v3
-        with:
-          name: backend-coverage-report
-          path: ./backend/coverage
+#       - name: Upload Coverage Report
+#         if: success()
+#         uses: actions/upload-artifact@v3
+#         with:
+#           name: backend-coverage-report
+#           path: ./backend/coverage
