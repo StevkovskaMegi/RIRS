@@ -1,119 +1,98 @@
 const request = require('supertest');
 const express = require('express');
 const jwt = require('jsonwebtoken');
-const mongoose = require('mongoose');
-const managerRouter = require('../routes/managerRouter'); 
-const Expense = require('../schemas/expense');
-const User = require('../schemas/user'); 
-const ExpensesService = require('../services/ExpensesService');
+const nodemailer = require('nodemailer');
+const managerRouter = require('../routes/managerRouter');
+const ExpenseService = require('../services/ExpensesService');
+const sendNotification = require('../utils/EmailService'); // Funkcija za pošiljanje e-pošte
 
-jest.mock('../schemas/expense'); 
-jest.mock('../schemas/user'); 
-beforeEach(() => {
-    jest.spyOn(ExpensesService, 'getExpenses').mockResolvedValue([]); 
-});
+jest.mock('../services/ExpensesService'); // Mockanje ExpensesService
+jest.mock('../utils/emailService'); // Mockanje sendNotification
 
-afterEach(() => {
-    jest.restoreAllMocks();
-});
 const app = express();
 app.use(express.json());
 app.use('/api/manager', managerRouter);
 
 const JWT_SECRET = 'Vkm123vkm$$$';
 const managerToken = jwt.sign({ userId: '123', role: 'manager' }, JWT_SECRET);
-const employeeToken = jwt.sign({ userId: '456', role: 'employee' }, JWT_SECRET);
-
 const mockExpense = {
-    id: '1',
-    user: '456',
-    description: 'Business trip expenses',
-    amount: 500,
-    date: new Date().toISOString(),  
-    status: 'pending',
-  };
-  
-
-const mockManager = {
-  id: '123',
-  role: 'manager',
-};
-
-const mockEmployee = {
-  id: '456',
-  role: 'employee',
+  id: '1',
+  user: { name: 'John Doe', email: 'johndoe@example.com' },
+  description: 'Business trip expenses',
+  amount: 500,
+  date: new Date().toISOString(),
+  status: 'pending',
 };
 
 describe('Manager Router', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    jest.clearAllMocks(); // Čistimo vse mocke pred vsakim testom
   });
-  test('GET /api/manager/requests/users - Should return pending expenses for manager', async () => {
-    const mockExpense = {
-        id: "1",
-        description: "Business trip expenses",
-        amount: 500,
-        status: "pending",
-        date: "2024-12-10T11:06:29.407Z",
-        user: "456"
-    };
-    ExpensesService.getExpenses.mockResolvedValueOnce([mockExpense]); 
 
+  test('PUT /requests/:id/status - Should update expense status and send notification', async () => {
+    // Mockanje posodobitve zahtevka
+    ExpenseService.updateExpenseStatus = jest.fn().mockResolvedValue({
+      ...mockExpense,
+      status: 'approved', // Simuliramo posodobitev statusa
+    });
+
+    // Mockanje funkcije za pošiljanje e-pošte
+    sendNotification.mockResolvedValue({ success: true });
+
+    // Pošljemo PUT zahtevo za posodobitev statusa
     const response = await request(app)
-        .get('/api/manager/requests/users')
-        .set('Authorization', `Bearer ${managerToken}`);
+      .put('/api/manager/requests/1/status')
+      .set('Authorization', `Bearer ${managerToken}`)
+      .send({ status: 'approved' });
 
+    // Preverimo odgovor
     expect(response.status).toBe(200);
-    expect(response.body).toEqual([mockExpense]); // Check that the response body matches the mockExpense
-});
-
-  
-
-  test('GET /api/manager/requests/users - Should return 401 for missing token', async () => {
-    const response = await request(app).get('/api/manager/requests/users');
-
-    expect(response.status).toBe(401);
-    expect(response.body.message).toBe('Access token required');
+    expect(response.body.status).toBe('approved');
+    expect(ExpenseService.updateExpenseStatus).toHaveBeenCalledWith('1', 'approved');
+    expect(sendNotification).toHaveBeenCalledWith(mockExpense.user, 'approved'); // Preverimo, da je bila funkcija za pošiljanje e-pošte poklicana
   });
 
-  test('GET /api/manager/requests/users - Should return 404 if no pending expenses exist', async () => {
-    ExpensesService.getExpenses.mockResolvedValueOnce([]); // Simulate no pending expenses
+  test('PUT /requests/:id/status - Should return error if expense request is not found', async () => {
+    // Mockanje, da updateExpenseStatus vrne null (ni najden zahtev)
+    ExpenseService.updateExpenseStatus.mockResolvedValue(null);
 
     const response = await request(app)
-        .get('/api/manager/requests/users')
-        .set('Authorization', `Bearer ${managerToken}`);
+      .put('/api/manager/requests/999/status') // Napačen ID zahtevka
+      .set('Authorization', `Bearer ${managerToken}`)
+      .send({ status: 'approved' });
 
     expect(response.status).toBe(404);
-    expect(response.body.message).toBe('No pending expenses found');
-});
+    expect(response.body.message).toBe('Expense request not found');
+  });
 
+  test('PUT /requests/:id/status - Should handle errors when sending notification fails', async () => {
+    // Mockanje uspešne posodobitve statusa
+    ExpenseService.updateExpenseStatus.mockResolvedValue({
+      ...mockExpense,
+      status: 'approved',
+    });
 
-test('GET /api/manager/requests/users - Should handle database errors gracefully', async () => {
-    ExpensesService.getExpenses.mockRejectedValueOnce(new Error('Database error'));
+    // Mockanje napake pri pošiljanju e-pošte
+    sendNotification.mockRejectedValue(new Error('Email sending failed'));
 
     const response = await request(app)
-        .get('/api/manager/requests/users')
-        .set('Authorization', `Bearer ${managerToken}`);
+      .put('/api/manager/requests/1/status')
+      .set('Authorization', `Bearer ${managerToken}`)
+      .send({ status: 'approved' });
 
-    // Ensure the status is 500 as expected for a database error
-    expect(response.status).toBe(500);
+    expect(response.status).toBe(500); // Očakujemo napako pri pošiljanju e-pošte
+    expect(response.body.message).toBe('Email sending failed');
+  });
 
-    // Ensure the error message in the response is 'Internal server error'
-    expect(response.body.message).toBe('Internal server error');
-});
-
-
-test('GET /api/manager/requests/users - Should return 403 if manager token is invalid', async () => {
+  test('PUT /requests/:id/status - Should return 403 if manager token is invalid', async () => {
     const invalidToken = 'invalid.token.here';  
-  
+
     const response = await request(app)
-      .get('/api/manager/requests/users')  
+      .put('/api/manager/requests/1/status')  
       .set('Authorization', `Bearer ${invalidToken}`)  
-      .send(); 
-  
+      .send({ status: 'approved' });
+
     expect(response.status).toBe(403); 
     expect(response.body.message).toBe('Invalid token');  
   });
-  
-  
 });

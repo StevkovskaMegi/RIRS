@@ -61,31 +61,4 @@ describe('Expense Router', () => {
     expect(response.body.message).toBe('Invalid token');
   });
 
-  expenseRouter.post('/', async (req, res) => {
-  const { description, amount, category, status, user } = req.body;
-
-  if (!description || description.trim() === '') {
-    return res.status(400).json({ message: 'Description is required' });
-  }
-  if (typeof amount !== 'number' || amount <= 0) {
-    return res.status(400).json({ message: 'Amount must be a positive number' });
-  }
-  if (!category) {
-    return res.status(400).json({ message: 'Category is required' });
-  }
-  if (!['pending', 'approved', 'rejected'].includes(status)) {
-    return res.status(400).json({ message: 'Invalid status' });
-  }
-  if (!user) {
-    return res.status(400).json({ message: 'User ID is required' });
-  }
-
-  try {
-    const newExpense = await ExpenseService.createExpense(req.body);
-    res.status(201).json(newExpense);
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-});
-
 });

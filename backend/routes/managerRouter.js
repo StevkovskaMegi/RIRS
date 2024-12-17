@@ -3,7 +3,7 @@ const router = express.Router();
 const jwt = require("jsonwebtoken");
 
 const JWT_SECRET = "Vkm123vkm$$$";
-
+const sendNotification = require('../utils/EmailService');  // Uvozimo sendNotification iz emailService
 
 const UserService = require("../services/UserService");
 const ExpenseService = require("../services/ExpensesService");
@@ -104,5 +104,25 @@ router.get('/requests/recentCsv/:token/', authMiddlewareWithTokenInUri, async (r
         res.status(500).json({ message: err.message });
     }
 });
+
+// backend managerRouter.js
+router.put('/requests/:id/status', authMiddleware, async (req, res) => {
+    try {
+        const { status } = req.body;
+        const expenseRequest = await ExpenseService.updateExpenseStatus(req.params.id, status);
+
+        if (!expenseRequest) {
+            return res.status(404).json({ message: 'Expense request not found' });
+        }
+
+        // Pošlji obvestilo uporabniku, da je njegov zahtevek odobren ali zavrnjen
+        await sendNotification(expenseRequest.user, status);
+
+        res.status(200).json(expenseRequest);
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+});
+
 
 module.exports = router;
