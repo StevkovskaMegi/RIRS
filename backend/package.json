@@ -10,9 +10,7 @@
     "nodemailer": "^6.9.16"
   },
   "scripts": {
-    "test": "jest --runInBand",
-    "build": "react-scripts build"
-
+    "test": "jest --runInBand"
   },
   "devDependencies": {
     "jest": "^29.7.0",
