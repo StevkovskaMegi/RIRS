@@ -22,13 +22,13 @@ jobs:
     - name: Setup Node.js
       uses: actions/setup-node@v3
       with:
-        node-version: 20
+        node-version: 22
 
     - name: Cache Node Modules
       uses: actions/cache@v3
       with:
         path: ./front/node_modules
-        key: ${{ runner.os }}-frontend-${{ hashFiles('./front/package-lock.json') }}
+        key: ${{ runner.os }}-front-${{ hashFiles('./front/package-lock.json') }}
         restore-keys: |
           ${{ runner.os }}-front-
 
@@ -66,7 +66,7 @@ jobs:
       uses: actions/cache@v3
       with:
         path: ./front/node_modules
-        key: ${{ runner.os }}-frontend-${{ hashFiles('./front/package-lock.json') }}
+        key: ${{ runner.os }}-front-${{ hashFiles('./front/package-lock.json') }}
         restore-keys: |
           ${{ runner.os }}-front-
 
@@ -130,6 +130,5 @@ jobs:
         npx sonar-scanner \
           -Dsonar.projectKey=${{ secrets.PROJECT_KEY }} \
           -Dsonar.organization=${{ secrets.ORGANIZATION_KEY }} \
-          -Dsonar.sources=./04_DevOps_Deploying/primer/frontend \
           -Dsonar.host.url=https://sonarcloud.io \
           -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info
