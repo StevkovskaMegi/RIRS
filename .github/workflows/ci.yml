@@ -19,15 +19,27 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: 22
+          node-version: 22 # Stabilna različica Node.js (spremenite glede na vaše zahteve)
+
+      - name: Cache Node Modules
+        uses: actions/cache@v3
+        with:
+          path: front/node_modules
+          key: front-${{ runner.os }}-node-${{ hashFiles('front/package-lock.json') }}
+          restore-keys: |
+            front-${{ runner.os }}-node-
 
       - name: Install Dependencies
         working-directory: ./front
-        run: npm install
+        run: npm ci
+
+      - name: Build Frontend
+        working-directory: ./front
+        run: npm run build
 
       - name: Run Tests
         working-directory: ./front
-        run: npm test -- --coverage  # Add the run key for running tests
+        run: npm test -- --coverage  
 
       - name: Upload Coverage Report
         if: success()
@@ -35,6 +47,13 @@ jobs:
         with:
           name: front-coverage-report
           path: ./front/coverage
+
+      - name: Upload Build Artifacts
+        if: success()
+        uses: actions/upload-artifact@v3
+        with:
+          name: front-build
+          path: ./front/build
 
   backend-tests:
     name: Run Backend Tests
@@ -46,11 +65,23 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: 22
+          node-version: 22 # Stabilna različica Node.js (spremenite glede na zahteve)
+
+      - name: Cache Node Modules
+        uses: actions/cache@v3
+        with:
+          path: backend/node_modules
+          key: backend-${{ runner.os }}-node-${{ hashFiles('backend/package-lock.json') }}
+          restore-keys: |
+            backend-${{ runner.os }}-node-
 
       - name: Install Dependencies
         working-directory: ./backend
-        run: npm install
+        run: npm ci
+
+      - name: Build Backend
+        working-directory: ./backend
+        run: npm run build
 
       - name: Run Tests
         working-directory: ./backend
@@ -62,3 +93,10 @@ jobs:
         with:
           name: backend-coverage-report
           path: ./backend/coverage
+
+      - name: Upload Build Artifacts
+        if: success()
+        uses: actions/upload-artifact@v3
+        with:
+          name: backend-build
+          path: ./backend/dist

@@ -80,7 +80,7 @@ describe('UserList Component', () => {
     expect(screen.getByText(firstUser.name)).toBeInTheDocument();
   });
 
-  test('handles an empty user list gracefully', () => {
+  test('handles an empty user list', () => {
     render(<UserList users={[]} />);
     expect(screen.getByText(/Recent Added Employees/i)).toBeInTheDocument();
     expect(screen.queryByText(/User/i)).not.toBeInTheDocument();

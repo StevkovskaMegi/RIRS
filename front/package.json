@@ -8,14 +8,16 @@
     "@mui/icons-material": "^6.1.6",
     "@mui/material": "^6.1.6",
     "@testing-library/user-event": "^13.5.0",
-    "axios": "^1.7.7",
+    "apisauce": "^3.0.0",
+    "axios": "^1.7.9",
     "jwt-decode": "^4.0.0",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
     "react-router-dom": "^6.27.0",
     "react-scripts": "5.0.1",
     "recharts": "^2.13.3",
-    "web-vitals": "^2.1.4"
+    "util": "^0.12.5",
+    "web-vitals": "^4.2.4"
   },
   "scripts": {
     "start": "react-scripts start",
@@ -43,7 +45,22 @@
   },
   "proxy": "http://localhost:3000",
   "devDependencies": {
+    "@babel/core": "^7.26.0",
+    "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
+    "@babel/plugin-transform-private-property-in-object": "^7.25.9",
+    "@babel/preset-env": "^7.26.0",
+    "@babel/preset-react": "^7.26.3",
     "@testing-library/jest-dom": "^6.6.3",
-    "@testing-library/react": "^16.1.0"
+    "@testing-library/react": "^16.1.0",
+    "babel-jest": "^29.7.0"
+  },
+  "type": "module",
+  "jest": {
+    "transform": {
+      "^.+\\.jsx?$": "babel-jest"
+    },
+    "transformIgnorePatterns": [
+      "/node_modules/(?!axios)/"
+    ]
   }
 }
