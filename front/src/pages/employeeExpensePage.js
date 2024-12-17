@@ -25,12 +25,7 @@ import {
   Pie,
   Cell,
   Tooltip,
-  Legend,
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
+  Legend
 } from "recharts";
 import { useNavigate } from "react-router-dom";
 import {

@@ -5,12 +5,10 @@ import {
   Typography,
   Grid,
   Avatar,
-  IconButton,
   Button,
   Box,
 } from '@mui/material';
 const UserList = ({ users }) => {
-  const [visiblePasswords, setVisiblePasswords] = useState({});
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 6; // Number of users per page
 

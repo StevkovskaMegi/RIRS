@@ -4,12 +4,8 @@ import {
   Toolbar,
   Button,
   Typography,
-  Box,
-  Avatar,
-  IconButton,
+  Box
 } from '@mui/material';
-import { AccountCircle } from '@mui/icons-material';
-import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
 const Navbar = ({ user }) => {

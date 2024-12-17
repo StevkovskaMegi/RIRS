@@ -1,6 +1,6 @@
 import {Button, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow} from "@mui/material";
-import {fetchUsersRequests, approveRequest, declineRequest} from "../services/api";
-import {useEffect, useState} from "react";
+import { approveRequest, declineRequest} from "../services/api";
+
 
 
 

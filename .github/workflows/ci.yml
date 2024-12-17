@@ -16,6 +16,14 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v3
 
+      - name: Cache Node.js Dependencies
+        uses: actions/cache@v3
+        with:
+          path: ./front/node_modules
+          key: ${{ runner.os }}-node-modules-${{ hashFiles('./front/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-modules-
+
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
@@ -23,7 +31,7 @@ jobs:
 
       - name: Install Dependencies
         working-directory: ./front
-        run: npm install
+        run: npm ci
 
       - name: Build Frontend
         working-directory: ./front
@@ -52,6 +60,14 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v3
 
+      - name: Cache Node.js Dependencies
+        uses: actions/cache@v3
+        with:
+          path: ./backend/node_modules
+          key: ${{ runner.os }}-node-modules-${{ hashFiles('./backend/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-modules-
+
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
@@ -59,7 +75,7 @@ jobs:
 
       - name: Install Dependencies
         working-directory: ./backend
-        run: npm install
+        run: npm ci
 
       - name: Build Backend
         working-directory: ./backend

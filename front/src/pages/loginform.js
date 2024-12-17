@@ -44,7 +44,7 @@ const LoginForm = ({ loginChange }) => {
       );
       setToken(response.data.token);
       const { user } = response.data;
-      localStorage.setItem('token', response.data.token);
+      localStorage.setItem('token', token);
       localStorage.setItem('user', JSON.stringify(user));
       setUser(user);
       loginChange();
