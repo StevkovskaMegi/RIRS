@@ -43,7 +43,6 @@ const EmployeeExpensePage = () => {
   const [userLogged, setUserLogged] = useState(null);
   const [user, setUser] = useState(null);
   const [message, setMessage] = useState(null);
-  const [error, setError] = useState("");
   const [expenses, setExpenses] = useState([]);
   const [groups, setGroups] = useState([]); // For storing available groups
   const [selectedGroup, setSelectedGroup] = useState(""); // For selected group ID
