@@ -75,10 +75,9 @@ jobs:
         cd ./front
         npm install
 
-    - name: Run tests with coverage
-      run: |
-        cd ./front
-        npm run test:ci
+   - name: Run Tests
+        working-directory: ./front
+        run: npm test -- --coverage
 
      - name: Upload Coverage Report
         if: success()
@@ -86,5 +85,3 @@ jobs:
         with:
           name: frontend-coverage-report
           path: ./front/coverage
-
-  
