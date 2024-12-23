@@ -1,12 +1,12 @@
 // emailService.js
 const nodemailer = require('nodemailer');
+require('dotenv').config(); // Load environment variables
 
-// Konfiguracija za Gmail SMTP strežnik
 const transporter = nodemailer.createTransport({
-    service: 'outlook',  // Lahko uporabite tudi druge storitve, kot so Outlook, SendGrid itd.
+    service: 'outlook',
     auth: {
-        user: 'megi.stevkovska@student.um.si',  // Vaš e-poštni naslov
-        pass: '@MS23052001m@'    // Vaše Gmail geslo ali aplikacijsko geslo (za večjo varnost)
+        user: process.env.EMAIL_USER, // Load email user from the environment
+        pass: process.env.EMAIL_PASS  // Load email password from the environment
     }
 });
 
