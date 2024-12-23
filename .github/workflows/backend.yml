@@ -84,9 +84,8 @@ jobs:
         working-directory: ./backend
         run: npm test -- --coverage
 
-    -name: Upload Coverage Report
-        if: success()
-        uses: actions/upload-artifact@v3
-        with:
-          name: backend-coverage-report
-          path: ./backend/coverage
+    - name: Upload coverage report  # Naložitev poročila o pokritosti kode
+      uses: actions/upload-artifact@v4
+      with:
+        name: backend-coverage  # Ime artefakta
+        path: ./backend/coverage/  # Pot do poročila o pokritosti kode

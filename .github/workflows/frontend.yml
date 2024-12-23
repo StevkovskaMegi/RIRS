@@ -79,9 +79,8 @@ jobs:
         working-directory: ./front
         run: npm test -- --coverage
 
-     - name: Upload Coverage Report
-        if: success()
-        uses: actions/upload-artifact@v3
-        with:
-          name: frontend-coverage-report
-          path: ./front/coverage
+     - name: Upload coverage report  # Naložitev poročila o pokritosti kode
+      uses: actions/upload-artifact@v4
+      with:
+        name: frontend-coverage  # Ime artefakta
+        path: ./front/coverage/  # Pot do poročila o pokritosti kode
