@@ -37,7 +37,7 @@ jobs:
 
     - name: Install dependencies  # Namestitev odvisnosti
       run: |
-        cd 0./backend
+        cd ./backend
         npm ci
 
     - name: Upload backend artifacts  # Naložitev artefaktov za backend
