@@ -1,0 +1,89 @@
+name: Frontend CI/CD
+
+on:
+  push:
+    branches:
+      - main
+      - production
+  pull_request:
+    branches:
+      - main
+      - production
+
+jobs:
+  # Gradnja frontenda
+  build-frontend:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: 22
+
+    - name: Cache node_modules
+      uses: actions/cache@v3
+      with:
+        path: ./front/node_modules
+        key: ${{ runner.os }}-front-${{ hashFiles('./front/package-lock.json') }}
+        restore-keys: |
+          ${{ runner.os }}-front-
+
+    - name: Install dependencies
+      run: |
+        cd ./front
+        npm ci
+
+    - name: Build application
+      run: |
+        cd ./front
+        npm run build
+
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: frontend-build
+        path: ./front/build/
+
+  # Testiranje frontenda
+  test-frontend:
+    needs: build-frontend
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: 22
+
+    - name: Cache node_modules
+      uses: actions/cache@v3
+      with:
+        path: ./front/node_modules
+        key: ${{ runner.os }}-front-${{ hashFiles('./front/package-lock.json') }}
+        restore-keys: |
+          ${{ runner.os }}-front-
+
+    - name: Install dependencies
+      run: |
+        cd ./front
+        npm install
+
+    - name: Run tests with coverage
+      run: |
+        cd ./front
+        npm run test:ci
+
+    - name: Upload coverage report
+      uses: actions/upload-artifact@v4
+      with:
+        name: frontend-coverage
+        path: ./front/coverage/
+
+  

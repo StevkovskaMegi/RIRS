@@ -1,108 +1,98 @@
-name: Full CI/CD Pipeline
+# name: CI Workflow
 
-on:
-  push:
-    branches:
-      - main
-      - production
-  pull_request:
-    branches:
-      - main
-      - production
+# on:
+#   push:
+#     branches:
+#       - main
+#   pull_request:
+#     branches:
+#       - main
 
-jobs:
-  # Backend CI
-  backend-ci:
-    name: Backend CI
-    runs-on: ubuntu-latest
+# jobs:
+#   frontend-tests:
+#     name: Frontend CI
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: Checkout Code
+#         uses: actions/checkout@v3
 
-    steps:
-    - name: Checkout Code
-      uses: actions/checkout@v3
+#       - name: Cache Node.js Dependencies
+#         uses: actions/cache@v3
+#         with:
+#           path: ./front/node_modules
+#           key: ${{ runner.os }}-node-modules-${{ hashFiles('./front/package-lock.json') }}
+#           restore-keys: |
+#             ${{ runner.os }}-node-modules-
 
-    - name: Setup Node.js
-      uses: actions/setup-node@v3
-      with:
-        node-version: 22
+#       - name: Set up Node.js
+#         uses: actions/setup-node@v3
+#         with:
+#           node-version: 22
 
-    - name: Cache Dependencies
-      uses: actions/cache@v3
-      with:
-        path: ./backend/node_modules
-        key: ${{ runner.os }}-backend-${{ hashFiles('./backend/package-lock.json') }}
-        restore-keys: |
-          ${{ runner.os }}-backend-
+#       - name: Install Dependencies
+#         working-directory: ./front
+#         run: npm ci
 
-    - name: Install Dependencies
-      run: |
-        cd backend
-        npm ci
+#       - name: Build Frontend
+#         working-directory: ./front
+#         run: |
+#           if [ -f "package.json" ] && grep -q '"build":' package.json; then
+#             npm run build
+#           else
+#             echo "No build script found, skipping build step."
+#           fi
 
-    - name: Build Backend
-      run: |
-        cd backend
-        if [ -f "package.json" ] && grep -q '"build":' package.json; then
-          npm run build
-        else
-          echo "No build script found, skipping build."
-        fi
+#       - name: Run Tests
+#         working-directory: ./front
+#         run: npm test -- --coverage
 
-    - name: Run Tests
-      run: |
-        cd backend
-        npm test -- --coverage
+#       - name: Upload Coverage Report
+#         if: success()
+#         uses: actions/upload-artifact@v3
+#         with:
+#           name: frontend-coverage-report
+#           path: ./front/coverage
 
-    - name: Upload Coverage Report
-      if: success()
-      uses: actions/upload-artifact@v3
-      with:
-        name: backend-coverage
-        path: ./backend/coverage/
+#   backend-tests:
+#     name: Backend CI
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: Checkout Code
+#         uses: actions/checkout@v3
 
-  # Frontend CI
-  frontend-ci:
-    name: Frontend CI
-    runs-on: ubuntu-latest
+#       - name: Cache Node.js Dependencies
+#         uses: actions/cache@v3
+#         with:
+#           path: ./backend/node_modules
+#           key: ${{ runner.os }}-node-modules-${{ hashFiles('./backend/package-lock.json') }}
+#           restore-keys: |
+#             ${{ runner.os }}-node-modules-
 
-    steps:
-    - name: Checkout Code
-      uses: actions/checkout@v3
+#       - name: Set up Node.js
+#         uses: actions/setup-node@v3
+#         with:
+#           node-version: 22
 
-    - name: Setup Node.js
-      uses: actions/setup-node@v3
-      with:
-        node-version: 22
+#       - name: Install Dependencies
+#         working-directory: ./backend
+#         run: npm ci
 
-    - name: Cache Dependencies
-      uses: actions/cache@v3
-      with:
-        path: ./frontend/node_modules
-        key: ${{ runner.os }}-frontend-${{ hashFiles('./frontend/package-lock.json') }}
-        restore-keys: |
-          ${{ runner.os }}-frontend-
+#       - name: Build Backend
+#         working-directory: ./backend
+#         run: |
+#           if [ -f "package.json" ] && grep -q '"build":' package.json; then
+#             npm run build
+#           else
+#             echo "No build script found, skipping build step."
+#           fi
 
-    - name: Install Dependencies
-      run: |
-        cd frontend
-        npm ci
+#       - name: Run Tests
+#         working-directory: ./backend
+#         run: npm test -- --coverage
 
-    - name: Build Frontend
-      run: |
-        cd frontend
-        if [ -f "package.json" ] && grep -q '"build":' package.json; then
-          npm run build
-        else
-          echo "No build script found, skipping build."
-        fi
-
-    - name: Run Tests
-      run: |
-        cd frontend
-        npm test -- --coverage
-
-    - name: Upload Coverage Report
-      if: success()
-      uses: actions/upload-artifact@v3
-      with:
-        name: frontend-coverage
-        path: ./frontend/coverage/
+#       - name: Upload Coverage Report
+#         if: success()
+#         uses: actions/upload-artifact@v3
+#         with:
+#           name: backend-coverage-report
+#           path: ./backend/coverage
