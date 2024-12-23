@@ -75,13 +75,15 @@ jobs:
         cd ./front
         npm install
 
-    - name: Run tests with coverage  # Izvajanje testov s pokritostjo
+    - name: Run tests with coverage
       run: |
         cd ./front
         npm test -- --coverage
 
-    - name: Upload coverage report  # Naložitev poročila o pokritosti kode
+    - name: Upload coverage report
       uses: actions/upload-artifact@v4
       with:
-        name: frontend-coverage  # Ime artefakta
-        path: ./front/coverage/  # Pot do poročila o pokritosti kode
+        name: frontend-coverage
+        path: ./front/coverage/
+
+  
