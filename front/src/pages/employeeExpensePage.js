@@ -6,10 +6,6 @@ import {
   Button,
   Container,
   Typography,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
   Box,
   Grid,
   Table,
@@ -17,23 +13,13 @@ import {
   TableHead,
   TableCell,
   TableRow,
-  TableContainer,
-  TableBody
+  TableBody,
+  FormControl,
+  InputLabel,Select,MenuItem,TableContainer
 } from "@mui/material";
-import {
-  PieChart,
-  Pie,
-  Cell,
-  Tooltip,
-  Legend
-} from "recharts";
+import { PieChart, Pie, Cell, Tooltip, Legend } from "recharts";
 import { useNavigate } from "react-router-dom";
-import {
-  getGroups,
-  getUserById,
-  requestExpense,
-  getExpensesByUserId,
-} from "../services/api";
+import { getGroups, getUserById, requestExpense, getExpensesByUserId } from "../services/api";
 
 const EmployeeExpensePage = () => {
   const [description, setDescription] = useState("");
@@ -45,9 +31,13 @@ const EmployeeExpensePage = () => {
   const [expenses, setExpenses] = useState([]);
   const [groups, setGroups] = useState([]); // For storing available groups
   const [selectedGroup, setSelectedGroup] = useState(""); // For selected group ID
+  const [startDate, setStartDate] = useState(""); // Start date filter
+  const [endDate, setEndDate] = useState(""); // End date filter
+  const [filteredExpenses, setFilteredExpenses] = useState([]); // Filtered expenses to display
 
   const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
   const navigate = useNavigate();
+
   useEffect(() => {
     const fetchUserData = async () => {
       const token = localStorage.getItem("token");
@@ -61,6 +51,7 @@ const EmployeeExpensePage = () => {
 
           const expenses = await getExpensesByUserId(decodedUser.userId);
           setExpenses(expenses);
+          setFilteredExpenses(expenses); // Set all expenses initially
         } catch (error) {
           console.error("Error fetching user data:", error);
         }
@@ -73,7 +64,7 @@ const EmployeeExpensePage = () => {
     const loadGroups = async () => {
       try {
         const fetchedGroups = await getGroups();
-        setGroups(fetchedGroups); 
+        setGroups(fetchedGroups);
       } catch (error) {
         console.error("Error fetching groups:", error);
       }
@@ -81,6 +72,7 @@ const EmployeeExpensePage = () => {
     loadGroups();
   }, []);
 
+  // Handle expense form submission
   const handleExpenseSubmit = async (e) => {
     e.preventDefault();
     if (!user) {
@@ -93,7 +85,7 @@ const EmployeeExpensePage = () => {
       description,
       amount: parseFloat(amount),
       date,
-      group: isGroupExpense ?  selectedGroup : null,
+      group: isGroupExpense ? selectedGroup : null,
       status: "pending",
     };
 
@@ -103,8 +95,27 @@ const EmployeeExpensePage = () => {
       setAmount("");
       setDate("");
       setIsGroupExpense(false);
+      // Re-fetch expenses to update the list
+      const expenses = await getExpensesByUserId(userLogged.userId);
+      setExpenses(expenses);
+      setFilteredExpenses(expenses); // Reset filtered expenses
     } catch (err) {
+      console.error("Error submitting expense:", err);
     }
+  };
+
+  // Handle filtering expenses by date
+  const handleFilter = () => {
+    const filtered = expenses.filter((expense) => {
+      const expenseDate = new Date(expense.date);
+      const start = startDate ? new Date(startDate) : null;
+      const end = endDate ? new Date(endDate) : null;
+
+      return (
+        (!start || expenseDate >= start) && (!end || expenseDate <= end)
+      );
+    });
+    setFilteredExpenses(filtered);
   };
 
   const budgetChartData =
@@ -181,11 +192,37 @@ const EmployeeExpensePage = () => {
         </form>
       </Box>
 
+      {/* Date Filter Section */}
+      <Box mt={4} mb={4}>
+        <Typography variant="h4" gutterBottom>
+          Filter Expenses by Date
+        </Typography>
+        <TextField
+          label="Start Date"
+          type="date"
+          value={startDate}
+          onChange={(e) => setStartDate(e.target.value)}
+          fullWidth
+          margin="normal"
+          InputLabelProps={{ shrink: true }}
+        />
+        <TextField
+          label="End Date"
+          type="date"
+          value={endDate}
+          onChange={(e) => setEndDate(e.target.value)}
+          fullWidth
+          margin="normal"
+          InputLabelProps={{ shrink: true }}
+        />
+        <Button onClick={handleFilter} variant="contained" color="primary">
+          Filter
+        </Button>
+      </Box>
+
       <Grid container spacing={4}>
         <Grid item xs={12} md={6}>
-          <h2>
-            Budget Overview
-          </h2>
+          <h2>Budget Overview</h2>
           {budgetChartData.length > 0 ? (
             <ResponsiveContainer width="100%" height={300}>
               <PieChart>
@@ -211,36 +248,44 @@ const EmployeeExpensePage = () => {
           )}
         </Grid>
       </Grid>
-      <div>
-      <h2>Your Expenses</h2>
-      <TableContainer component={Paper}>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>Description</TableCell>
-              <TableCell>Amount</TableCell>
-              <TableCell>Date</TableCell>
-              <TableCell>Status</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {expenses.map((expense) => {
-              // Format the expense date
-              const formattedDate = new Date(expense.date).toLocaleDateString(); // Format as MM/DD/YYYY
 
-              return (
-                <TableRow key={expense._id}>
-                  <TableCell>{expense.description}</TableCell>
-                  <TableCell>{expense.amount}</TableCell>
-                  <TableCell>{formattedDate}</TableCell>
-                  <TableCell>{expense.status}</TableCell>
-                </TableRow>
-              );
-            })}
-          </TableBody>
-        </Table>
-      </TableContainer>
-    </div>
+      <div>
+        <h2>Your Expenses</h2>
+        <TableContainer component={Paper}>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>Description</TableCell>
+                <TableCell>Amount</TableCell>
+                <TableCell>Date</TableCell>
+                <TableCell>Status</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+            {filteredExpenses.length > 0 ? (
+    filteredExpenses.map((expense) => {
+      const formattedDate = new Date(expense.date).toLocaleDateString();
+
+      return (
+        <TableRow key={expense._id}>
+          <TableCell>{expense.description}</TableCell>
+          <TableCell>{expense.amount}</TableCell>
+          <TableCell>{formattedDate}</TableCell>
+          <TableCell>{expense.status}</TableCell>
+        </TableRow>
+      );
+    })
+  ) : (
+    <TableRow>
+      <TableCell colSpan={4} align="center">
+        No expenses found
+      </TableCell>
+    </TableRow>
+  )}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </div>
     </Container>
   );
 };
