@@ -105,12 +105,13 @@ jobs:
       - name: Build Docker image for frontend  # Gradnja Docker slike
         run: |
           docker build -t my-frontend:${{ github.sha }} ./front  # Gradnja Docker slike
-          docker tag my-frontend:${{ github.sha }} my-frontend:latest  # Oznaka za najnovejšo različico
+          docker tag my-frontend:latest megis/my-frontend:latest
 
       - name: Push Docker image to Docker Hub  # Nalaganje Docker slike
         run: |
           docker push my-frontend:${{ github.sha }}  # Naloži Docker sliko z edinstveno oznako
-          docker push my-frontend:latest  # Naloži Docker sliko z oznako 'latest'
+          docker push megis/my-frontend:latest
+  # Naloži Docker sliko z oznako 'latest'
 
 
   

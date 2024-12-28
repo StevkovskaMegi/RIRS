@@ -111,9 +111,10 @@ jobs:
       - name: Build Docker image for backend
         run: |
           docker build -t my-backend:${{ github.sha }} ./backend  # Gradnja Docker slike
-          docker tag my-backend:${{ github.sha }} my-backend:latest  # Dodaj najnovejšo oznako
+          docker tag my-backend:latest megis/my-backend:latest
+
 
       - name: Push Docker image to Docker Hub
         run: |
           docker push my-backend:${{ github.sha }}  # Pushing Docker image
-          docker push my-backend:latest  # Pushing the latest image
+          docker push megis/my-backend:latest
