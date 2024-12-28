@@ -89,7 +89,6 @@ jobs:
   build-frontend-docker:
     needs: build-frontend  # Gradnja Docker slike bo izvedena po uspešni gradnji frontenda
     runs-on: ubuntu-latest
-//test
     steps:
       - name: Checkout code  # Kloniranje repozitorija
         uses: actions/checkout@v3
