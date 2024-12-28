@@ -104,19 +104,26 @@ const EmployeeExpensePage = () => {
     }
   };
 
-  // Handle filtering expenses by date
   const handleFilter = () => {
     const filtered = expenses.filter((expense) => {
       const expenseDate = new Date(expense.date);
       const start = startDate ? new Date(startDate) : null;
       const end = endDate ? new Date(endDate) : null;
-
+  
+      // Normalize the dates to avoid time-related issues
+      if (start) start.setHours(0, 0, 0, 0);
+      if (end) end.setHours(23, 59, 59, 999);
+  
+      console.log("Filtering expenses:", expenseDate, start, end); // Debug log
+  
       return (
         (!start || expenseDate >= start) && (!end || expenseDate <= end)
       );
     });
     setFilteredExpenses(filtered);
   };
+  
+  
 
   const budgetChartData =
     user && user.budget ? [{ name: "Budget", value: user.budget }] : [];

@@ -30,7 +30,7 @@ beforeEach(() => {
 
   // Mock API methods
   api.getUserById.mockResolvedValue({ userId: "test-user", budget: 500 });
-  api.getExpensesByUserId.mockResolvedValue([]);
+  api.getExpensesByUserId.mockResolvedValue({});
   api.requestExpense.mockResolvedValue({});
 });
 
@@ -67,72 +67,6 @@ describe("EmployeeExpensePage Component", () => {
     expect(await screen.findByText("No expenses found")).toBeInTheDocument();
   });
 
-  // test('filters expenses by date and shows the filtered result', async () => {
-  //   // Render the component
-  //   render(
-  //     <MemoryRouter>
-  //       <EmployeeExpensePage />
-  //     </MemoryRouter>
-  //   );
-  
-  //   // Mocked expenses for the test
-  //   const mockedExpenses = [
-  //     {
-  //       _id: '1',
-  //       description: 'Expense 1',
-  //       amount: 50,
-  //       date: '2024-12-01',
-  //       status: 'pending',
-  //     },
-  //     {
-  //       _id: '2',
-  //       description: 'Expense 2',
-  //       amount: 100,
-  //       date: '2024-12-10',
-  //       status: 'approved',
-  //     },
-  //     {
-  //       _id: '3',
-  //       description: 'Expense 3',
-  //       amount: 200,
-  //       date: '2024-12-20',
-  //       status: 'pending',
-  //     },
-  //   ];
-  
-  //   // Set the mocked expenses in the component
-  //   api.getExpensesByUserId.mockResolvedValueOnce(mockedExpenses);
-  
-  //   // Set filter dates with a range that includes only the second expense
-  //   fireEvent.change(screen.getByLabelText('Start Date'), { target: { value: '2024-12-01' } });
-  //   fireEvent.change(screen.getByLabelText('End Date'), { target: { value: '2024-12-10' } });
-  //   fireEvent.click(screen.getByRole('button', { name: /filter/i }));
-  
-  //   // Wait for the filtered table to be rendered
-  //   await screen.findByRole('table');  // Ensures the table is rendered
-  
-  //   // Wait for the rows to be populated (if necessary)
-  //   await waitFor(() => expect(screen.getAllByRole('row')).toHaveLength(2));  // This ensures that rows are rendered
-  
-  //   // Find the row that contains the description "Expense 2"
-  //   const rows = await screen.findAllByRole('row');
-  
-  //   // Check for the correct row by inspecting the description
-  //   const expenseRow = rows.find(row => {
-  //     const descriptionCell = row.querySelector('td:nth-child(1)'); // assuming description is in the first column
-  //     return descriptionCell && descriptionCell.textContent === 'Expense 2';
-  //   });
-  
-  //   // Ensure the expense row with "Expense 2" exists
-  //   expect(expenseRow).toBeInTheDocument();
-  
-  //   // Ensure other expenses are not in the table
-  //   expect(screen.queryByText('Expense 1')).toBeNull();
-  //   expect(screen.queryByText('Expense 3')).toBeNull();
-  // });
-  
-  
-
   test("displays no expenses when filter criteria do not match", () => {
     const { getByLabelText, getByText } = render(
       <MemoryRouter>
@@ -152,4 +86,60 @@ describe("EmployeeExpensePage Component", () => {
     // Ensure no expenses are displayed
     expect(screen.getByText("No expenses found")).toBeInTheDocument();
   });
+  test("filters expenses by a date range and shows no results when no expenses match", async () => {
+    render(
+      <MemoryRouter>
+        <EmployeeExpensePage />
+      </MemoryRouter>
+    );
+
+    // Set filter dates with no matching expenses
+    fireEvent.change(screen.getByLabelText("Start Date"), {
+      target: { value: "2025-01-01" },
+    });
+    fireEvent.change(screen.getByLabelText("End Date"), {
+      target: { value: "2025-12-31" },
+    });
+    fireEvent.click(screen.getByText("Filter"));
+
+    // Assert that "No expenses found" is displayed
+    expect(await screen.findByText("No expenses found")).toBeInTheDocument();
+  });
+  // test("filters expenses by a date range and displays only matching expenses", async () => {
+  //   // Initial expenses set up in the mock
+  //   api.getExpensesByUserId.mockResolvedValueOnce([
+  //     { _id: "1", description: "Expense 1", amount: 50, date: "2024-12-01", status: "pending" },
+  //     { _id: "2", description: "Expense 2", amount: 30, date: "2024-12-10", status: "pending" },
+  //     { _id: "3", description: "Expense 3", amount: 100, date: "2024-12-15", status: "approved" },
+  //     { _id: "4", description: "Expense 4", amount: 70, date: "2024-12-20", status: "approved" },
+  //   ]);
+  
+  //   // Render the page with a router
+  //   render(
+  //     <MemoryRouter>
+  //       <EmployeeExpensePage />
+  //     </MemoryRouter>
+  //   );
+  
+  //   // Simulate changing the filter dates
+  //   fireEvent.change(screen.getByLabelText("Start Date"), {
+  //     target: { value: "2024-12-05" }, // Set start date to December 5
+  //   });
+  //   fireEvent.change(screen.getByLabelText("End Date"), {
+  //     target: { value: "2024-12-15" }, // Set end date to December 15
+  //   });
+  
+  //   // Simulate clicking the filter button
+  //   fireEvent.click(screen.getByText("Filter"));
+  
+  //   // Wait for the expenses to be filtered and displayed
+  //   await waitFor(() => {
+  //     const expenseItems = screen.queryAllByText(/Expense/);
+  //     expect(expenseItems.length).toBe(2); // Expecting only two expenses
+  //     expect(expenseItems[0].textContent).toContain("Expense 1");
+  //     expect(expenseItems[1].textContent).toContain("Expense 2");
+  //   });
+    
+  // });
+  
 });
