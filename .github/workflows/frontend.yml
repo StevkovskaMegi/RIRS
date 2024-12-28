@@ -16,37 +16,37 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-    - name: Setup Node.js
-      uses: actions/setup-node@v3
-      with:
-        node-version: 22
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 22
 
-    - name: Cache node_modules
-      uses: actions/cache@v3
-      with:
-        path: ./front/node_modules
-        key: ${{ runner.os }}-front-${{ hashFiles('./front/package-lock.json') }}
-        restore-keys: |
-          ${{ runner.os }}-front-
+      - name: Cache node_modules
+        uses: actions/cache@v3
+        with:
+          path: ./front/node_modules
+          key: ${{ runner.os }}-front-${{ hashFiles('./front/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-front-
 
-    - name: Install dependencies
-      run: |
-        cd ./front
-        npm ci
+      - name: Install dependencies
+        run: |
+          cd ./front
+          npm ci
 
-    - name: Build application
-      run: |
-        cd ./front
-        npm run build
+      - name: Build application
+        run: |
+          cd ./front
+          npm run build
 
-    - name: Upload build artifacts
-      uses: actions/upload-artifact@v4
-      with:
-        name: frontend-build
-        path: ./front/build/
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-build
+          path: ./front/build/
 
   # Testiranje frontenda
   test-frontend:
@@ -54,64 +54,60 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
-
-    - name: Setup Node.js
-      uses: actions/setup-node@v3
-      with:
-        node-version: 22
-
-    - name: Cache node_modules
-      uses: actions/cache@v3
-      with:
-        path: ./front/node_modules
-        key: ${{ runner.os }}-front-${{ hashFiles('./front/package-lock.json') }}
-        restore-keys: |
-          ${{ runner.os }}-front-
-
-    - name: Install dependencies
-      run: |
-        cd ./front
-        npm install
-
-    - name: Run tests with coverage
-      run: |
-        cd ./front
-        npm test -- --coverage
-
-    - name: Upload coverage report
-      uses: actions/upload-artifact@v4
-      with:
-        name: frontend-coverage
-        path: ./front/coverage/
-  # Job za gradnjo Docker slike za frontend
-  build-frontend-docker:
-    needs: build-frontend  # Gradnja Docker slike bo izvedena po uspešni gradnji frontenda
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code  # Kloniranje repozitorija
+      - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Set up Docker  # Nastavitev Docker okolja
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 22
+
+      - name: Cache node_modules
+        uses: actions/cache@v3
+        with:
+          path: ./front/node_modules
+          key: ${{ runner.os }}-front-${{ hashFiles('./front/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-front-
+
+      - name: Install dependencies
+        run: |
+          cd ./front
+          npm install
+
+      - name: Run tests with coverage
+        run: |
+          cd ./front
+          npm test -- --coverage
+
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-coverage
+          path: ./front/coverage/
+  # Job za gradnjo Docker slike za frontend
+  build-frontend-docker:
+    needs: build-frontend # Gradnja Docker slike bo izvedena po uspešni gradnji frontenda
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code # Kloniranje repozitorija
+        uses: actions/checkout@v3
+
+      - name: Set up Docker # Nastavitev Docker okolja
         uses: docker/setup-buildx-action@v2
 
-      - name: Log in to Docker Hub  # Prijava v Docker Hub
+      - name: Log in to Docker Hub # Prijava v Docker Hub
         uses: docker/login-action@v2
         with:
-          username: ${{ secrets.DOCKER_USERNAME }}  # Uporaba GitHub Secrets za uporabniško ime
-          password: ${{ secrets.DOCKER_PASSWORD }}  # Uporaba GitHub Secrets za geslo
+          username: ${{ secrets.DOCKER_USERNAME }} # Uporaba GitHub Secrets za uporabniško ime
+          password: ${{ secrets.DOCKER_PASSWORD }} # Uporaba GitHub Secrets za geslo
 
-      - name: Build Docker image for frontend  # Gradnja Docker slike
+      - name: Build Docker image for frontend
         run: |
           docker build -t my-frontend:${{ github.sha }} ./front  # Gradnja Docker slike
-          docker tag my-frontend:latest megis/my-frontend:latest
+          docker tag my-frontend:${{ github.sha }} megis/my-frontend:latest
 
-      - name: Push Docker image to Docker Hub  # Nalaganje Docker slike
-        run: |
-          docker push my-frontend:${{ github.sha }}  # Naloži Docker sliko z edinstveno oznako
-          docker push megis/my-frontend:latest
-  # Naloži Docker sliko z oznako 'latest'
-
-
-  
+      - name: Push Docker image to Docker Hub
+      run: |
+        docker push my-frontend:${{ github.sha }}  # Push the unique SHA tag
+        docker push megis/my-frontend:latest      # Push the latest tag

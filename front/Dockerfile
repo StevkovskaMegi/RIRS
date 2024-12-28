@@ -1,20 +1,19 @@
-# Use Node.js version 22 as the base image
-FROM node:22
+FROM node:22 AS build
 
-# Set the working directory in the container
 WORKDIR /app
 
-# Copy package.json and package-lock.json (if exists)
-COPY package*.json ./
+COPY package.json package-lock.json ./
 
-# Install frontend dependencies
-RUN npm install
+RUN npm ci
 
-# Copy the rest of the frontend app
 COPY . .
 
-# Expose port 3001
-EXPOSE 3001
+RUN npm run build
 
-# Start the frontend app
-CMD ["npm", "start"]
+FROM nginx:alpine
+
+COPY --from=build /app/build /usr/share/nginx/html
+
+EXPOSE 80
+
+CMD ["nginx", "-g", "daemon off;"]
