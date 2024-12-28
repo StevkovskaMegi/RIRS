@@ -104,8 +104,10 @@ jobs:
 
     - name: Build Docker image for Frontend
       run: |
-        docker build -t ${{ secrets.DOCKER_USERNAME }}/front:dev ./front
+        docker build -t ${{ secrets.DOCKER_USERNAME }}/front:dev -f ./Dockerfile ./front
         docker tag ${{ secrets.DOCKER_USERNAME }}/front:dev ${{ secrets.DOCKER_USERNAME }}/front:${{ github.sha }}
+        docker push ${{ secrets.DOCKER_USERNAME }}/front:dev
+        docker push ${{ secrets.DOCKER_USERNAME }}/front:${{ github.sha }}
 
     - name: Push Docker image to Docker Hub
       run: |
