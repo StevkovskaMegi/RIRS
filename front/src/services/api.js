@@ -1,8 +1,12 @@
 const axios = require('axios');
 const token = localStorage.getItem("token");
 
-const api =  process.env.REACT_APP_BACKEND_URL;
-
+const api = axios.create({
+  baseURL: "/api",
+  headers: {
+    "Content-Type": "application/json"
+  },
+});
 
 api.interceptors.request.use(
   (config) => {
