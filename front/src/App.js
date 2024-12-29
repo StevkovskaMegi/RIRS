@@ -37,20 +37,32 @@ function App() {
           console.warn('Token has expired');
           localStorage.removeItem('token');
           setUser(null);
+          window.location.href = '/login'; // Redirect to login
+
         }
       } catch (error) {
         console.error('Error decoding token:', error);
         setUser(null);
+        window.location.href = '/login'; // Redirect to login
+
       }
     } else {
       console.log('No token found, user not authenticated');
       setUser(null); // If no token, clear user state
+      window.location.href = '/login'; // Redirect to login
+
     }
   }, []);
 
   useEffect(() => {
     console.log('User state updated:', user); // This will log whenever user changes
   }, [user]); // This hook will run every time user state changes
+ // Automatically redirect to /login if there is no user
+ useEffect(() => {
+  if (!user) {
+    navigate('/login'); // Redirect to login page if no user found
+  }
+}, [user, navigate]);
 
   const loginChange = () => {
     const storedUser = localStorage.getItem('user');
