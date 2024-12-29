@@ -64,5 +64,7 @@
     "transformIgnorePatterns": [
       "/node_modules/(?!axios)/"
     ]
-  }
+  },
+  "homepage": "/login"
+
 }
