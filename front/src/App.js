@@ -3,7 +3,7 @@ import {
   BrowserRouter as Router,
   Route,
   Routes,
-  useLocation,
+  useLocation,useNavigate
 } from 'react-router-dom';
 import Navbar from './components/NavBar.js';
 import AdminDashboard from './pages/adminDashboard';
@@ -22,6 +22,8 @@ function ConditionalNavbar({ user }) {
 
 function App() {
   const [user, setUser] = useState(null);
+  const navigate = useNavigate(); // <-- Use the hook here
+
 
   useEffect(() => {
     const token = localStorage.getItem('token');
