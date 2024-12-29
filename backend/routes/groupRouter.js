@@ -1,6 +1,6 @@
 const express = require('express');
 const Group = require('../schemas/group');
-const GroupService = require('../services/groupService');
+const GroupService = require('../services/GroupService');
 const jwt = require("jsonwebtoken");
 const JWT_SECRET = "Vkm123vkm$$$";
 
