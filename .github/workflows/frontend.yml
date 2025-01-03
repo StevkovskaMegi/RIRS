@@ -147,30 +147,29 @@ jobs:
           
   # Step 2: Dockerize and push image for Development (Main branch)
   dockerize-and-push-dev:
-  needs: create-static-site
-  runs-on: ubuntu-latest
-  environment: Development
-  if: github.ref == 'refs/heads/main'
-  steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
+    needs: create-static-site
+    runs-on: ubuntu-latest
+    environment: Development
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-    - name: Login to Docker Hub
-      uses: docker/login-action@v2
-      with:
-        username: ${{ secrets.DOCKER_USERNAME }}
-        password: ${{ secrets.DOCKER_PASSWORD }}
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
 
-    - name: Build Docker image for Development
-      run: |
-        docker build -f Dockerfile -t ${{ secrets.DOCKER_USERNAME }}/front:dev .
-        docker tag ${{ secrets.DOCKER_USERNAME }}/front:dev ${{ secrets.DOCKER_USERNAME }}/front:${{ github.sha }}
+      - name: Build Docker image for Development
+        run: |
+          docker build -f Dockerfile -t ${{ secrets.DOCKER_USERNAME }}/front:dev .
+          docker tag ${{ secrets.DOCKER_USERNAME }}/front:dev ${{ secrets.DOCKER_USERNAME }}/front:${{ github.sha }}
 
-    - name: Push Docker image to Docker Hub
-      run: |
-        docker push ${{ secrets.DOCKER_USERNAME }}/front:dev
-        docker push ${{ secrets.DOCKER_USERNAME }}/front:${{ github.sha }}
-
+      - name: Push Docker image to Docker Hub
+        run: |
+          docker push ${{ secrets.DOCKER_USERNAME }}/front:dev
+          docker push ${{ secrets.DOCKER_USERNAME }}/front:${{ github.sha }}
 
   # Step 3: Dockerize and push image for Production (Production branch)
   dockerize-and-push-prod:
