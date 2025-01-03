@@ -127,8 +127,6 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./front  # Adjust this path to the folder containing index.html
-
-
   # Step 3: Docker Image Build and Push for Development
   dockerize-and-push-dev:
     needs: create-static-site
