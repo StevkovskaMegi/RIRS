@@ -11,6 +11,7 @@ on:
       - production
 
 jobs:
+  # Gradnja frontenda
   build-frontend:
     runs-on: ubuntu-latest
 
@@ -85,121 +86,30 @@ jobs:
           name: frontend-coverage
           path: ./front/coverage/
   # Gradnja Docker slike in nalaganje na Docker Hub - Development
-  # dockerize-and-push-dev:
-  #   needs: test-frontend
-  #   runs-on: ubuntu-latest
-  #   environment: Development
-  #   if: github.ref == 'refs/heads/main'
-
-  #   steps:
-  #   - name: Checkout code
-  #     uses: actions/checkout@v3
-
-  #   - name: Login to Docker Hub
-  #     uses: docker/login-action@v2
-  #     with:
-  #       username: ${{ secrets.DOCKER_USERNAME }}
-  #       password: ${{ secrets.DOCKER_PASSWORD }}
-
-  #   - name: Build Docker image for Frontend
-  #     run: |
-  #       docker build -t ${{ secrets.DOCKER_USERNAME }}/front:dev -f ./Dockerfile ./front
-  #       docker tag ${{ secrets.DOCKER_USERNAME }}/front:dev ${{ secrets.DOCKER_USERNAME }}/front:${{ github.sha }}
-  #       docker push ${{ secrets.DOCKER_USERNAME }}/front:dev
-  #       docker push ${{ secrets.DOCKER_USERNAME }}/front:${{ github.sha }}
-
-  #   - name: Push Docker image to Docker Hub
-  #     run: |
-  #       docker push ${{ secrets.DOCKER_USERNAME }}/front:dev
-  #       docker push ${{ secrets.DOCKER_USERNAME }}/front:${{ github.sha }}
-  #GIthub
-  deploy-to-github-pages:
-    needs: test-frontend
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./front  # Adjust this path to the folder containing index.html
- # Step 1: Create static website and deploy to GitHub Pages
-  create-static-site:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Create index.html
-        run: |
-          mkdir -p docs
-          echo '<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Project Name</title></head><body><h1>Project Name</h1><p>Team Members:</p><ul><li>Member 1</li><li>Member 2</li><li>Member 3</li></ul><p>Short Description of the Project:</p><p>This project aims to...</p></body></html>' > docs/index.html
-
-      - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./docs  # Path where index.html is located
-          
-  # Step 2: Dockerize and push image for Development (Main branch)
   dockerize-and-push-dev:
-    needs: create-static-site
+    needs: test-frontend
     runs-on: ubuntu-latest
     environment: Development
     if: github.ref == 'refs/heads/main'
+
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+    - name: Checkout code
+      uses: actions/checkout@v3
 
-      - name: Login to Docker Hub
-        uses: docker/login-action@v2
-        with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
+    - name: Login to Docker Hub
+      uses: docker/login-action@v2
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Build Docker image for Development
-        run: |
-          docker build -f Dockerfile -t ${{ secrets.DOCKER_USERNAME }}/front:dev .
-          docker tag ${{ secrets.DOCKER_USERNAME }}/front:dev ${{ secrets.DOCKER_USERNAME }}/front:${{ github.sha }}
+    - name: Build Docker image for Frontend
+      run: |
+        docker build -t ${{ secrets.DOCKER_USERNAME }}/front:dev -f ./Dockerfile ./front
+        docker tag ${{ secrets.DOCKER_USERNAME }}/front:dev ${{ secrets.DOCKER_USERNAME }}/front:${{ github.sha }}
+        docker push ${{ secrets.DOCKER_USERNAME }}/front:dev
+        docker push ${{ secrets.DOCKER_USERNAME }}/front:${{ github.sha }}
 
-      - name: Push Docker image to Docker Hub
-        run: |
-          docker push ${{ secrets.DOCKER_USERNAME }}/front:dev
-          docker push ${{ secrets.DOCKER_USERNAME }}/front:${{ github.sha }}
-
-  # Step 3: Dockerize and push image for Production (Production branch)
-  dockerize-and-push-prod:
-    needs: create-static-site
-    runs-on: ubuntu-latest
-    environment:
-      name: Production
-      url: ${{ steps.deploy-to-github-pages.outputs.page_url }}
-    if: github.ref == 'refs/heads/production'
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Check for Quality Gate (for Production)
-        run: |
-          curl -u ${{ secrets.SONAR_TOKEN }}: \
-            "https://sonarcloud.io/api/project_badges/measure?project=${{ secrets.PROJECT_KEY }}&metric=alert_status" | grep -q "OK" || exit 1
-
-      - name: Login to Docker Hub
-        uses: docker/login-action@v2
-        with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
-
-      - name: Build Docker image for Production
-        run: |
-          docker build -t ${{ secrets.DOCKER_USERNAME }}/front:prod ./front
-          docker tag ${{ secrets.DOCKER_USERNAME }}/front:prod ${{ secrets.DOCKER_USERNAME }}/front:${{ github.sha }}
-
-      - name: Push Docker image to Docker Hub
-        run: |
-          docker push ${{ secrets.DOCKER_USERNAME }}/front:prod
-          docker push ${{ secrets.DOCKER_USERNAME }}/front:${{ github.sha }}
+    - name: Push Docker image to Docker Hub
+      run: |
+        docker push ${{ secrets.DOCKER_USERNAME }}/front:dev
+        docker push ${{ secrets.DOCKER_USERNAME }}/front:${{ github.sha }}
