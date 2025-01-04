@@ -24,82 +24,72 @@ function ConditionalNavbar({ user }) {
 
 function App() {
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true); // New loading state to handle async logic
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate(); // Correct placement of useNavigate within Router context
 
-  // Token validation and user state management
   useEffect(() => {
     const token = localStorage.getItem('token');
-    
+    console.log('Token from localStorage:', token);
+
     if (token) {
       try {
         const decodedUser = jwtDecode(token);
+        console.log('Decoded User:', decodedUser);
+
         const currentTime = Date.now() / 1000;
-
-        console.log("Decoded User:", decodedUser);
-
         if (decodedUser.exp > currentTime) {
-          setUser(decodedUser); // Token is valid, set user state
-          navigate(decodedUser.role === 'admin' ? '/dashboard' : '/employee'); // Navigate based on role
+          setUser(decodedUser);
+          navigate('/dashboard');
         } else {
-          localStorage.removeItem('token'); // Remove expired token
-          setUser(null); // Clear user state
-          navigate('/login'); // Redirect to login if token expired
+          localStorage.removeItem('token');
+          setUser(null);
+          navigate('/login');
         }
       } catch (error) {
         console.error('Error decoding token:', error);
-        setUser(null); // Clear user state in case of error
-        navigate('/login'); // Redirect to login on error
+        setUser(null);
+        navigate('/login');
       }
     } else {
-      setUser(null); // No token, clear user state
-      navigate('/login'); // Redirect to login if no token found
+      setUser(null);
+      navigate('/login');
     }
-    setLoading(false); // Done loading the token validation
-  }, [navigate]); // Only depend on navigate here
-
-  // Function to handle login state change
-  const loginChange = () => {
-    const storedUser = localStorage.getItem('user');
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
-    } else {
-      setUser(null); // Clear user if no stored user found
-    }
-  };
+    setLoading(false); // Set loading to false after checking the token
+  }, [navigate]);
 
   if (loading) {
-    // If loading, show loading indicator
     return <div>Loading...</div>;
   }
 
   return (
-    <Router> {/* Ensure everything is wrapped inside Router */}
-      <ConditionalNavbar user={user} />
-      <Routes>
-        <Route path='/login' element={<LoginForm loginChange={loginChange} />} />
-        {user && user.role === 'manager' && (
-          <Route path='/manager' element={<ManagerDashboardLayout />} />
-        )}
-        {user && user.role === 'admin' && (
-          <Route path='/dashboard' element={<AdminDashboard />} />
-        )}
-        {user && user.role === 'employee' && (
-          <Route path='/employee' element={<EmployeeExpensePage />} />
-        )}
-        {/* Catch unmatched routes */}
-        <Route
-          path='*'
-          element={
-            <div style={{ textAlign: 'center', marginTop: '50px' }}>
-              <h1>Unauthorized</h1>
-              <p>You are not authorized to access this page</p>
-            </div>
-          }
-        />
-      </Routes>
-    </Router>
+    <Routes>
+      <Route path='/login' element={<LoginForm />} />
+      {user && user.role === 'manager' && (
+        <Route path='/manager' element={<ManagerDashboardLayout />} />
+      )}
+      {user && user.role === 'admin' && (
+        <Route path='/dashboard' element={<AdminDashboard />} />
+      )}
+      {user && user.role === 'employee' && (
+        <Route path='/employee' element={<EmployeeExpensePage />} />
+      )}
+      <Route
+        path='*'
+        element={
+          <div style={{ textAlign: 'center', marginTop: '50px' }}>
+            <h1>Unauthorized</h1>
+            <p>You are not authorized to access this page</p>
+          </div>
+        }
+      />
+    </Routes>
   );
 }
 
-export default App;
+export default function AppWrapper() {
+  return (
+    <Router> {/* Ensure the Router is at the top level */}
+      <App />
+    </Router>
+  );
+}
