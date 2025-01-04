@@ -13,14 +13,14 @@ import EmployeeExpensePage from './pages/employeeExpensePage';
 import ManagerDashboardLayout from './layout/ManagerDashboardLayout';
 import { jwtDecode } from 'jwt-decode';
 
-function ConditionalNavbar({ user }) {
-  const location = useLocation(); // Safe inside Router context
+// function ConditionalNavbar({ user }) {
+//   const location = useLocation(); // Safe inside Router context
 
-  if (location.pathname === '/login') {
-    return null; // Don't render Navbar on the login page
-  }
-  return <Navbar user={user} />; // Render Navbar on all other pages
-}
+//   if (location.pathname === '/login') {
+//     return null; // Don't render Navbar on the login page
+//   }
+//   return <Navbar user={user} />; // Render Navbar on all other pages
+// }
 
 function App() {
   const [user, setUser] = useState(null);
