@@ -57,7 +57,7 @@ function App() {
  // Redirect to login
 
     }
-  }, []);
+  }, [navigate]);
 
   useEffect(() => {
     console.log('User state updated:', user); // This will log whenever user changes
