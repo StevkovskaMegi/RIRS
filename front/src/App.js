@@ -14,61 +14,57 @@ import ManagerDashboardLayout from './layout/ManagerDashboardLayout';
 import { jwtDecode } from 'jwt-decode';
 
 function ConditionalNavbar({ user }) {
-  const location = useLocation(); // This is now safely within the Router context.
+  const location = useLocation(); // Safe inside Router context
 
   if (location.pathname === '/login') {
-    return null; // Don't render the Navbar on the login page.
+    return null; // Don't render Navbar on the login page
   }
-  return <Navbar user={user} />; // Render Navbar on all other pages.
+  return <Navbar user={user} />; // Render Navbar on all other pages
 }
 
 function App() {
   const [user, setUser] = useState(null);
-  const navigate = useNavigate(); // <-- Use the hook here
+  const navigate = useNavigate(); // Correct placement of useNavigate within Router context
 
-  // Combine token check and user state management
+  // Token validation and user state management
   useEffect(() => {
-    console.log('Checking token validity...');
     const token = localStorage.getItem('token');
-
+    
     if (token) {
       try {
         const decodedUser = jwtDecode(token);
         const currentTime = Date.now() / 1000;
 
         if (decodedUser.exp > currentTime) {
-          setUser(decodedUser); // Set user state if the token is valid
+          setUser(decodedUser); // Token is valid, set user state
         } else {
-          console.warn('Token has expired');
-          localStorage.removeItem('token');
+          localStorage.removeItem('token'); // Remove expired token
           setUser(null); // Clear user state
-          navigate('/login'); // Redirect to login
+          navigate('/login'); // Redirect to login if token expired
         }
       } catch (error) {
         console.error('Error decoding token:', error);
-        setUser(null); // Clear user state
-        navigate('/login'); // Redirect to login
+        setUser(null); // Clear user state in case of error
+        navigate('/login'); // Redirect to login on error
       }
     } else {
-      console.log('No token found, user not authenticated');
-      setUser(null); // Clear user state
-      navigate('/login'); // Redirect to login
+      setUser(null); // No token, clear user state
+      navigate('/login'); // Redirect to login if no token found
     }
   }, [navigate]); // Only depend on navigate here
 
-  // Handle login state change
+  // Function to handle login state change
   const loginChange = () => {
     const storedUser = localStorage.getItem('user');
-    console.log('stored user', storedUser);
     if (storedUser) {
       setUser(JSON.parse(storedUser));
     } else {
-      setUser(null);
+      setUser(null); // Clear user if no stored user found
     }
   };
 
   return (
-    <Router>
+    <Router> {/* Ensure everything is wrapped inside Router */}
       <ConditionalNavbar user={user} />
       <Routes>
         <Route path='/login' element={<LoginForm loginChange={loginChange} />} />
