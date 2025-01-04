@@ -24,6 +24,7 @@ function ConditionalNavbar({ user }) {
 
 function App() {
   const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true); // New loading state to handle async logic
   const navigate = useNavigate(); // Correct placement of useNavigate within Router context
 
   // Token validation and user state management
@@ -39,7 +40,7 @@ function App() {
 
         if (decodedUser.exp > currentTime) {
           setUser(decodedUser); // Token is valid, set user state
-          navigate('/dashboard'); // Navigate to dashboard if token is present
+          navigate(decodedUser.role === 'admin' ? '/dashboard' : '/employee'); // Navigate based on role
         } else {
           localStorage.removeItem('token'); // Remove expired token
           setUser(null); // Clear user state
@@ -54,6 +55,7 @@ function App() {
       setUser(null); // No token, clear user state
       navigate('/login'); // Redirect to login if no token found
     }
+    setLoading(false); // Done loading the token validation
   }, [navigate]); // Only depend on navigate here
 
   // Function to handle login state change
@@ -66,8 +68,8 @@ function App() {
     }
   };
 
-  if (!user) {
-    // If user is null, show loading or placeholder content while navigating
+  if (loading) {
+    // If loading, show loading indicator
     return <div>Loading...</div>;
   }
 
