@@ -3,7 +3,8 @@ import {
   BrowserRouter as Router,
   Route,
   Routes,
-  useLocation,useNavigate
+  useLocation,
+  useNavigate
 } from 'react-router-dom';
 import Navbar from './components/NavBar.js';
 import AdminDashboard from './pages/adminDashboard';
@@ -11,6 +12,7 @@ import LoginForm from './pages/loginform';
 import EmployeeExpensePage from './pages/employeeExpensePage';
 import ManagerDashboardLayout from './layout/ManagerDashboardLayout';
 import { jwtDecode } from 'jwt-decode';
+
 function ConditionalNavbar({ user }) {
   const location = useLocation(); // This is now safely within the Router context.
 
@@ -24,8 +26,9 @@ function App() {
   const [user, setUser] = useState(null);
   const navigate = useNavigate(); // <-- Use the hook here
 
-
+  // Combine token check and user state management
   useEffect(() => {
+    console.log('Checking token validity...');
     const token = localStorage.getItem('token');
 
     if (token) {
@@ -34,44 +37,29 @@ function App() {
         const currentTime = Date.now() / 1000;
 
         if (decodedUser.exp > currentTime) {
-          setUser(decodedUser); // Update user state
+          setUser(decodedUser); // Set user state if the token is valid
         } else {
           console.warn('Token has expired');
           localStorage.removeItem('token');
-          setUser(null);
-          navigate('/login'); // Instead of window.location.href = '/login';
- // Redirect to login
-
+          setUser(null); // Clear user state
+          navigate('/login'); // Redirect to login
         }
       } catch (error) {
         console.error('Error decoding token:', error);
-        setUser(null);
-        navigate('/login'); // Instead of window.location.href = '/login';
- // Redirect to login
-
+        setUser(null); // Clear user state
+        navigate('/login'); // Redirect to login
       }
     } else {
       console.log('No token found, user not authenticated');
-      setUser(null); // If no token, clear user state
-      navigate('/login'); // Instead of window.location.href = '/login';
- // Redirect to login
-
+      setUser(null); // Clear user state
+      navigate('/login'); // Redirect to login
     }
-  }, [navigate]);
+  }, [navigate]); // Only depend on navigate here
 
-  useEffect(() => {
-    console.log('User state updated:', user); // This will log whenever user changes
-  }, [user]); // This hook will run every time user state changes
- // Automatically redirect to /login if there is no user
- useEffect(() => {
-  if (!user) {
-    navigate('/login'); // Redirect to login page if no user found
-  }
-}, [user, navigate]);
-
+  // Handle login state change
   const loginChange = () => {
     const storedUser = localStorage.getItem('user');
-    console.log('stored user');
+    console.log('stored user', storedUser);
     if (storedUser) {
       setUser(JSON.parse(storedUser));
     } else {
@@ -83,14 +71,10 @@ function App() {
     <Router>
       <ConditionalNavbar user={user} />
       <Routes>
-        <Route path='/' element={<LoginForm loginChange={loginChange} />} />
+        <Route path='/login' element={<LoginForm loginChange={loginChange} />} />
         {user && user.role === 'manager' && (
           <Route path='/manager' element={<ManagerDashboardLayout />} />
         )}
-        <Route
-          path='/login'
-          element={<LoginForm loginChange={loginChange} />}
-        />
         {user && user.role === 'admin' && (
           <Route path='/dashboard' element={<AdminDashboard />} />
         )}
