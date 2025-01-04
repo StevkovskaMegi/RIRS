@@ -39,19 +39,22 @@ function App() {
           console.warn('Token has expired');
           localStorage.removeItem('token');
           setUser(null);
-          window.location.href = '/login'; // Redirect to login
+          navigate('/login'); // Instead of window.location.href = '/login';
+ // Redirect to login
 
         }
       } catch (error) {
         console.error('Error decoding token:', error);
         setUser(null);
-        window.location.href = '/login'; // Redirect to login
+        navigate('/login'); // Instead of window.location.href = '/login';
+ // Redirect to login
 
       }
     } else {
       console.log('No token found, user not authenticated');
       setUser(null); // If no token, clear user state
-      window.location.href = '/login'; // Redirect to login
+      navigate('/login'); // Instead of window.location.href = '/login';
+ // Redirect to login
 
     }
   }, []);
