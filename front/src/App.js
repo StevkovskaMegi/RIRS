@@ -3,10 +3,8 @@ import {
   BrowserRouter as Router,
   Route,
   Routes,
-  useLocation,
   useNavigate
 } from 'react-router-dom';
-import Navbar from './components/NavBar.js';
 import AdminDashboard from './pages/adminDashboard';
 import LoginForm from './pages/loginform';
 import EmployeeExpensePage from './pages/employeeExpensePage';
