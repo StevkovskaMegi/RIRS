@@ -312,7 +312,7 @@ export const fetchRecentRequests = async () => {
 
 export const handleDownloadCsv = async () => {
   const tempLink = document.createElement('a')
-  tempLink.href = 'https://rirs-xsu1.onrender.com/api/manager/requests/recentCsv/' + token +'/'
+  tempLink.href = 'https://localhost:3000/api/manager/requests/recentCsv/' + token +'/'
   tempLink.click()
 }
 
