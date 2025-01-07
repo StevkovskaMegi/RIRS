@@ -39,7 +39,7 @@ const LoginForm = ({ loginChange }) => {
 
     try {
       const response = await axios.post(
-        'http://localhost:3000/api/users/login',
+        'https://rirs-xsu1.onrender.com/api/users/login',
         { email, password }
       );
       setToken(response.data.token);

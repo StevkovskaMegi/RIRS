@@ -10,7 +10,7 @@ const expenseRouter = require('./routes/expenseRouter');
 const managerRouter = require('./routes/managerRouter');
 app.use(
   cors({
-    // origin: 'http://localhost:3000', // specify your frontend's address
+    // origin: 'https://rirs-xsu1.onrender.com', // specify your frontend's address
     // methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     // credentials: true,
     // allowedHeaders: ['Content-Type', 'Authorization'],
