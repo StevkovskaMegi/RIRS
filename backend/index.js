@@ -8,7 +8,6 @@ const userRouter = require('./routes/userRouter');
 const groupRouter = require('./routes/groupRouter');
 const expenseRouter = require('./routes/expenseRouter');
 const managerRouter = require('./routes/managerRouter');
-const cors = require('cors');
 app.use(cors({ origin: '*' })); // For any domain
 
 
